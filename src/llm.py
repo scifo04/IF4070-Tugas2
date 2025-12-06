@@ -5,7 +5,7 @@ import json
 import query
 
 def load_and_check_api():
-    env_path = '.env'
+    env_path = '../.env'
     load_dotenv(dotenv_path=env_path)
 
     api_key = os.environ.get("OPENROUTER_API_KEY")
