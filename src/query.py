@@ -6,7 +6,6 @@ def start_database(uri, credentials):
 
     driver = GraphDatabase.driver(URI, auth=AUTH)
     driver.verify_connectivity()
-    print("Connected to Neo4j!")
 
     return driver
 
