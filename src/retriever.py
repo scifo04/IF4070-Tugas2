@@ -2,9 +2,6 @@ import llm
 import query
 
 def retrieve():
-    print("="*50)
-    print("="*14,"WELCOME TO COURSE AI","="*14)
-    print("="*50)
     prompt = input("Insert your prompt here: ")
     return prompt
 
@@ -19,12 +16,6 @@ def process_retrieval(prompt):
 
     final_answer = llm.process_query(query_answer, driver)
 
-    return final_answer
+    actually_final_answer = llm.rag_style_answer(final_answer, client)
 
-def main():
-    inpute = retrieve()
-    outpute = process_retrieval(inpute)
-    print(outpute)
-
-if __name__ == "__main__":
-    main()
+    return actually_final_answer

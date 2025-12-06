@@ -94,3 +94,76 @@ def get_course_name_from_course_id(driver, course_id):
             return {
                 'answer': f"The name of the course with ID of {course_id} is {course_name}"
             } if course_id is not None else { 'answer': "There seems to be problem in the RAG" }
+        
+def get_credits_from_course_id(driver, course_id):
+    with driver.session() as session:
+        result = session.run("MATCH p = (:CourseID {CourseID: $course_id})-[:Has_Credits]->() RETURN p;", course_id=course_id)
+        for record in result:
+            path = record["p"]
+            
+            start_node = path.start_node
+            end_node   = path.end_node
+
+            course_id = start_node["CourseID"]
+            credits_course = end_node["CourseCredits"]
+
+            return {
+                'answer': f"The course with ID of {course_id} has {credits_course} credits"
+            } if course_id is not None else { 'answer': "There seems to be problem in the RAG" }
+        
+def get_course_majors_from_course_id(driver, course_id):
+    with driver.session() as session:
+        result = session.run("MATCH p = (:CourseID {CourseID: $course_id})-[:Belongs_To_Major]->() RETURN p;", course_id=course_id)
+        for record in result:
+            path = record["p"]
+            
+            start_node = path.start_node
+            end_node   = path.end_node
+
+            course_id = start_node["CourseID"]
+            majors = end_node["CourseMajor"]
+
+            return {
+                'answer': f"The course with ID of {course_id} belongs to {majors} major"
+            } if course_id is not None else { 'answer': "There seems to be problem in the RAG" }
+        
+def get_course_levels_from_course_id(driver, course_id):
+    with driver.session() as session:
+        result = session.run("MATCH p = (:CourseID {CourseID: $course_id})-[:Has_Course_Level_Of]->() RETURN p;", course_id=course_id)
+        for record in result:
+            path = record["p"]
+            
+            start_node = path.start_node
+            end_node   = path.end_node
+
+            course_id = start_node["CourseID"]
+            levels = end_node["CourseLevel"]
+
+            return {
+                'answer': f"The course with ID of {course_id} is a {levels.lower()} level course (Translate the level to english when answering)"
+            } if course_id is not None else { 'answer': "There seems to be problem in the RAG" }
+        
+def get_course_description_from_course_id(driver, course_id):
+    with driver.session() as session:
+        result = session.run("MATCH p = (:CourseID {CourseID: $course_id})-[:Has_Name_Of]->() RETURN p;", course_id=course_id)
+        for record in result:
+            path = record["p"]
+            
+            start_node = path.start_node
+            end_node   = path.end_node
+
+            course_id = start_node["CourseID"]
+            course_name = end_node["Course Name"]
+        result = session.run("MATCH p = (:CourseID {CourseID: $course_id})-[:Described_As]->() RETURN p;", course_id=course_id)
+        for record in result:
+            path = record["p"]
+            
+            start_node = path.start_node
+            end_node   = path.end_node
+
+            course_id = start_node["CourseID"]
+            course_description = end_node["CourseDescription"]
+
+            return {
+                'answer': f"The course with ID of {course_id} and name of {course_name} has description like this: {course_description}"
+            } if course_id is not None else { 'answer': "There seems to be problem in the RAG" }

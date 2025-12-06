@@ -59,16 +59,52 @@ def prompt_to_query(prompt, client, need_prompt=False):
     } if need_prompt else { "answer": response.choices[0].message.content }
 
 def process_query(answer, driver):
-    raw = answer['answer']
-    json_answer = json.loads(raw) 
-    target = json_answer['entity_target']
-    info = json_answer['entity_info']
+    try:
+        raw = answer['answer']
+        json_answer = json.loads(raw) 
+        target = json_answer['entity_target']
+        info = json_answer['entity_info']
 
-    if target == 'Course Name':
-        answer = query.get_course_name_from_course_id(driver, info)
-    else:
-        answer = {
-            'answer': 'There seems to be problem in the RAG'
-        }
+        if target == 'Course Name':
+            answer = query.get_course_name_from_course_id(driver, info)
+        elif target == 'Course Credits':
+            answer = query.get_credits_from_course_id(driver, info)
+        elif target == 'Course Major':
+            answer = query.get_course_majors_from_course_id(driver, info)
+        elif target == 'Course Levels':
+            answer = query.get_course_levels_from_course_id(driver, info)
+        elif target == 'Course Description':
+            answer = query.get_course_description_from_course_id(driver, info)
+        else:
+            answer = {
+                'answer': 'There seems to be problem in the RAG'
+            }
+        
+        return answer['answer']
+    except Exception as _:
+        return "Information is not found. Please re-enter the query"
     
-    return answer['answer']
+def rag_style_answer(answer, client):
+    user_prompt = """
+    Decorate this answer like typical LLM answer its prompt but don't deviate too much from the answer's topic\n\n
+
+    Prompt: {prompt}
+
+    Answer: {{Answer here}}
+    """
+
+    user_prompt = user_prompt.format(prompt=answer)
+
+    system_prompt = "You are the smartest AI assistant"
+
+    final_prompt = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt}
+    ]
+
+    response = client.chat.completions.create(
+        model="meta-llama/llama-3.3-70b-instruct",
+        messages=final_prompt
+    )
+
+    return response.choices[0].message.content
