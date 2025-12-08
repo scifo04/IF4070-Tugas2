@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 import query
+import re
 
 def load_and_check_api():
     env_path = '../.env'
@@ -64,21 +65,34 @@ def process_query(answer, driver):
         json_answer = json.loads(raw) 
         target = json_answer['entity_target']
         info = json_answer['entity_info']
+        entity_name = json_answer['entity_info_name']
 
-        if target == 'Course Name':
-            answer = query.get_course_name_from_course_id(driver, info)
-        elif target == 'Course Credits':
-            answer = query.get_credits_from_course_id(driver, info)
-        elif target == 'Course Major':
-            answer = query.get_course_majors_from_course_id(driver, info)
-        elif target == 'Course Levels':
-            answer = query.get_course_levels_from_course_id(driver, info)
-        elif target == 'Course Description':
-            answer = query.get_course_description_from_course_id(driver, info)
-        else:
-            answer = {
-                'answer': 'There seems to be problem in the RAG'
-            }
+        print(f"{target} -> {info} -> {entity_name}")
+
+        if entity_name == 'Course Name':
+            answer = query.get_course_id_from_course_name(driver, re.split(r'\s*,\s*', info) if isinstance(info, str) else info)
+        elif entity_name == 'Course Credits':
+            answer = query.get_course_id_from_course_credits(driver, re.split(r'\s*,\s*', info) if isinstance(info, str) else info)
+        elif entity_name == 'Course Major':
+            answer = query.get_course_id_from_course_majors(driver, re.split(r'\s*,\s*', info) if isinstance(info, str) else info)
+        elif entity_name == 'Course Levels':
+            answer = query.get_course_id_from_course_levels(driver, re.split(r'\s*,\s*', info) if isinstance(info, str) else info)
+
+        if target != 'Course ID':
+            if target == 'Course Name':
+                answer = query.get_course_name_from_course_id(driver, re.split(r'\s*,\s*', info) if isinstance(info, str) else info) if entity_name == 'Course ID' else { 'answer': answer['answer'] + ' AND ' +  query.get_course_name_from_course_id(driver, answer['context'])['answer']}
+            elif target == 'Course Credits':
+                answer = query.get_credits_from_course_id(driver, re.split(r'\s*,\s*', info) if isinstance(info, str) else info) if entity_name == 'Course ID' else { 'answer': answer['answer'] + ' AND ' +  query.get_credits_from_course_id(driver, answer['context'])['answer']}
+            elif target == 'Course Major':
+                answer = query.get_course_majors_from_course_id(driver, re.split(r'\s*,\s*', info) if isinstance(info, str) else info) if entity_name == 'Course ID' else { 'answer': answer['answer'] + ' AND ' +  query.get_course_majors_from_course_id(driver, answer['context'])['answer']}
+            elif target == 'Course Levels':
+                answer = query.get_course_levels_from_course_id(driver, re.split(r'\s*,\s*', info) if isinstance(info, str) else info) if entity_name == 'Course ID' else { 'answer': answer['answer'] + ' AND ' +  query.get_course_levels_from_course_id(driver, answer['context'])['answer']}
+            elif target == 'Course Description':
+                answer = query.get_course_description_from_course_id(driver, re.split(r'\s*,\s*', info) if isinstance(info, str) else info) if entity_name == 'Course ID' else { 'answer': answer['answer'] + ' AND ' +  query.get_course_description_from_course_id(driver, answer['context'])['answer']}
+            else:
+                answer = {
+                    'answer': 'There seems to be problem in the RAG'
+                }
         
         return answer['answer']
     except Exception as _:
