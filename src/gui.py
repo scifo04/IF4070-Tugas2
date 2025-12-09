@@ -130,10 +130,14 @@ class ChatWindow(QWidget):
         if not user_text:
             return
 
-        self.chat_box.append(f"<b>You:</b> {user_text}")
+        self.chat_box.append(f"<b>You:</b> {user_text}\n")
 
-        bot_reply = retriever.process_retrieval(user_text)
-        self.chat_box.append(bot_reply)
+        try:
+            bot_reply = retriever.process_retrieval(user_text)
+            self.chat_box.append(bot_reply + "\n")
+        except Exception as e:
+            print("Error Message: ")
+            self.chat_box.append("It seems the RAG is having a problem now. Please try again later\n")
 
         self.input_box.clear()
 

@@ -178,7 +178,7 @@ def get_course_levels_from_course_id(driver, course_id):
             'answer': f"""
                         The course with ID of:\n
                         {("\n".join([f"{i+1}. {item}" for i, item in enumerate(course_ids)]))}\n\n 
-                        Belong to majors of following:\n
+                        Belong to degree level of following:\n
                         {("\n".join([f"{i+1}. {item}" for i, item in enumerate(course_levels)]))}
                     """
         } if course_id is not None else { 'answer': "There seems to be problem in the RAG" }
