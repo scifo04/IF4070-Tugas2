@@ -136,7 +136,7 @@ class ChatWindow(QWidget):
             bot_reply = retriever.process_retrieval(user_text)
             self.chat_box.append(bot_reply + "\n")
         except Exception as e:
-            print("Error Message: ")
+            print("Error Message:",e)
             self.chat_box.append("It seems the RAG is having a problem now. Please try again later\n")
 
         self.input_box.clear()
