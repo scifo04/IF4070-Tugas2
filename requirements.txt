@@ -1,0 +1,4 @@
+pyqt5
+dotenv
+openai
+neo4j

@@ -4,9 +4,15 @@ from openai import OpenAI
 import json
 import query
 import re
+from pathlib import Path
 
 def load_and_check_api():
-    env_path = '../.env'
+    project_root = Path(__file__).resolve().parents[1]
+
+    env_path = project_root / ".env"
+
+    print("Loading .env from:", env_path)
+
     load_dotenv(dotenv_path=env_path)
 
     api_key = os.environ.get("OPENROUTER_API_KEY")
