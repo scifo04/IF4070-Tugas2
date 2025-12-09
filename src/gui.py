@@ -23,13 +23,11 @@ class TitleBar(QWidget):
 
         layout.addStretch()
 
-        # Minimize button
         self.min_btn = QLabel("—")
         self.min_btn.setStyleSheet("color: white; font-size: 20px; padding: 5px;")
         self.min_btn.mousePressEvent = self.minimize
         layout.addWidget(self.min_btn)
 
-        # Close button
         self.close_btn = QLabel("×")
         self.close_btn.setStyleSheet("color: white; font-size: 20px; padding: 5px;")
         self.close_btn.mousePressEvent = self.close_window
@@ -58,10 +56,8 @@ class ChatWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        # Remove native title bar → custom title bar
         self.setWindowFlags(Qt.FramelessWindowHint)
 
-        # White rounded border around entire window
         self.setStyleSheet("""
             QWidget {
                 background-color: #1e1e1e;
@@ -96,27 +92,22 @@ class ChatWindow(QWidget):
             }
         """)
 
-        # Fullscreen
         self.showFullScreen()
 
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # Custom black title bar
         self.title_bar = TitleBar(self)
         main_layout.addWidget(self.title_bar)
 
-        # Content frame
         content = QFrame()
         content.setStyleSheet("background-color: #1e1e1e; border-radius: 0px;")
         content_layout = QVBoxLayout()
 
-        # Chat box
         self.chat_box = QTextEdit()
         self.chat_box.setReadOnly(True)
         content_layout.addWidget(self.chat_box)
 
-        # Input row
         bottom_layout = QHBoxLayout()
 
         self.input_box = QLineEdit()
